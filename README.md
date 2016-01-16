@@ -37,14 +37,20 @@ Linux (Fedora, Red Hat, CentOS): sudo yum install git-core
 The best way to install Node.js is installing with nvm.
 
 cURL:
-
+```
 $ curl https://raw.github.com/creationix/nvm/master/install.sh | sh
+```
+
 Wget:
-
+```
 $ wget -qO- https://raw.github.com/creationix/nvm/master/install.sh | sh
-Once installed, restart the terminal and run the following command to install Node.js.
+```
 
+Once installed, restart the terminal and run the following command to install Node.js.
+```
 $ nvm install 0.10
+```
+
 Or you can download the installer and install it.
 
 Working with node is very easy, a quick reference guide for node can be found [hear](https://github.com/phaneendra/stinter-web/wiki/Working-with-Node)
@@ -90,7 +96,7 @@ All contributions are welcome! The simplest way to show your support for this pr
 * [Contributors](https://github.com/phaneendra/stinter-web/graphs/contributors)
 
 ### Third party libraries
-* see [LIBRARIES](https://github.com/phaneendra/stinter-web/blob/master/docs/LIBRARIES.md) files
+* see [LIBRARIES](https://github.com/phaneendra/stinter-web/wiki/LIBRARIES) files
 
 ## License
 * see [LICENSE](https://github.com/phaneendra/stinter-web/blob/master/LICENSE.md) file
@@ -98,11 +104,8 @@ All contributions are welcome! The simplest way to show your support for this pr
 ## Version
 * Version 0.0.1
 
-## How-to use this code
-* see [INSTRUCTIONS](https://github.com/username/sw-name/blob/master/INSTRUCTIONS.md) file
-
 ## Contact
-#### Phaneendra
+####  - Phaneendra
 * Homepage:
 * Twitter: [@phaneekr](https://twitter.com/phaneekr "phaneekr on twitter")
 * Slack:
