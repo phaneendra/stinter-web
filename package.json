@@ -1,15 +1,24 @@
 {
-  "name": "universal-redux-starter",
+  "name": "stinter-web",
   "version": "0.0.1",
-  "description": "Minimal starter for using universal-redux npm package",
+  "description": "Web Application for Stinter",
   "scripts": {
+    "lint": "eslint -c .eslintrc src api",
     "build": "universal-redux-build",
     "dev-server": "universal-redux-server",
     "dev": "concurrent --kill-others \"npm run watch-client\" \"npm run dev-server\"",
     "watch-client": "universal-redux-watch"
   },
   "author": {
-    "name": "Buck DeFore"
+    "name": "Phaneendra",
+    "url": "http://github.com/phaneendra/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/phaneendra/stinter-web.git"
+  },
+  "bugs": {
+    "url": "https://github.com/phaneendra/stinter-web/issues"
   },
   "license": "MIT",
   "dependencies": {
