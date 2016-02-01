@@ -48,7 +48,6 @@ platform/android/gen/
 platform/android/assets/
 
 # generated files
-bin/
 gen/
 
 ######################
@@ -77,7 +76,6 @@ profile
 *.pydevproject
 .project
 .metadata
-bin/**
 tmp/**
 tmp/**/*
 *.tmp
@@ -163,7 +161,6 @@ Desktop.ini
 # Directories
 ######################
 /build/**
-/bin/**
 /spring_loaded/**
 /deploy/**
 
