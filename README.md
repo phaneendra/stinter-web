@@ -26,10 +26,10 @@ If you are using npm 2, note that you may need to add additional dependencies yo
 
 #### Install Git
 
-Windows: Download & install msysgit.
-Mac: Install it with Homebrew, MacPorts or installer.
-Linux (Ubuntu, Debian): sudo apt-get install git-core
-Linux (Fedora, Red Hat, CentOS): sudo yum install git-core
+* Windows: Download & install msysgit.
+* Mac: Install it with Homebrew, MacPorts or installer.
+* Linux (Ubuntu, Debian): `sudo apt-get install git-core`
+* Linux (Fedora, Red Hat, CentOS): `sudo yum install git-core`
 
 
 #### Install Node.js

@@ -1,0 +1,8 @@
+mongodb:
+  build: ./mongo
+  ports:
+    - "27017:27017"
+  volumes:
+    - ./mongo/data/db:/data/db
+    - ./mongo/logs:/logs
+  restart: always

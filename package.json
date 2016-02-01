@@ -2,15 +2,8 @@
   "name": "stinter-web",
   "version": "0.0.1",
   "description": "Web Application for Stinter",
-  "scripts": {
-    "lint": "eslint -c .eslintrc src api",
-    "build": "universal-redux-build",
-    "dev-server": "universal-redux-server",
-    "dev": "concurrent --kill-others \"npm run watch-client\" \"npm run dev-server\"",
-    "watch-client": "universal-redux-watch"
-  },
   "author": {
-    "name": "Phaneendra",
+    "name": "phaneendra",
     "url": "http://github.com/phaneendra/"
   },
   "repository": {
@@ -21,18 +14,45 @@
     "url": "https://github.com/phaneendra/stinter-web/issues"
   },
   "license": "MIT",
-  "dependencies": {
-    "universal-redux": "3.0.0-rc6"
-  },
-  "devDependencies": {
-    "concurrently": "1.0.0",
-    "react": "^0.14.6",
-    "react-dom": "^0.14.6",
-    "react-redux": "4.0.6",
-    "react-router": "2.0.0-rc4",
-    "redux-simple-router": "2.0.1"
-  },
   "semistandard": {
     "parser": "babel-eslint"
+  },
+  "scripts": {
+    "lint": "eslint -c .eslintrc src api",
+    "build": "universal-redux-build",
+    "dev-server": "universal-redux-server",
+    "dev": "concurrent --kill-others \"npm run watch-client\" \"npm run dev-server\"",
+    "watch-client": "universal-redux-watch",
+    "api-dev": "better-npm-run start-dev-api",
+    "api": "better-npm-run start-prod-api"
+  },
+  "betterScripts": {
+    "start-prod-api": {
+      "command": "node ./bin/start_api.js",
+      "env": {
+        "NODE_PATH": "./src/api",
+        "NODE_ENV": "production",
+        "APIPORT": 3030,
+        "A127_APPROOT": "src"
+      }
+    },
+    "start-dev-api": {
+      "command": "node ./bin/start_api.js",
+      "env": {
+        "NODE_PATH": "./src/api",
+        "NODE_ENV": "development",
+        "APIPORT": 3030,
+        "A127_APPROOT": "src"
+      }
+    }
+  },
+  "dependencies": {
+    "a127-magic": "^0.11.1",
+    "better-npm-run": "0.0.5",
+    "mongoose": "^4.3.7",
+    "universal-redux": "3.0.0-rc7"
+  },
+  "devDependencies": {
+    "concurrently": "1.0.0"
   }
 }
