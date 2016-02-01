@@ -4,6 +4,8 @@
 /dist
 .tmp
 /www
+/tools/mongo/data
+/tools/mongo/logs
 
 ######################
 # Maven
