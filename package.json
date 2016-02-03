@@ -49,6 +49,8 @@
   "dependencies": {
     "a127-magic": "^0.11.1",
     "better-npm-run": "0.0.5",
+    "lodash": "^4.1.0",
+    "moment": "^2.11.1",
     "mongoose": "^4.3.7",
     "universal-redux": "3.0.0-rc7"
   },

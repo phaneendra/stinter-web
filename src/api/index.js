@@ -2,7 +2,7 @@
 
 import a127 from 'a127-magic';
 import express from 'express';
-import db from './lib/swagger-mongoose';
+import { init as swaggerMongoose } from './lib/swagger-mongoose';
 
 var app = express();
 
@@ -15,6 +15,7 @@ a127.init((config) => {
 
   // error handler to emit errors as a json string
   app.use((err, req, res, next) => {
+    console.log(err);
     if (typeof err !== 'object') {
       // If the object is not an Error, create a representation that appears to be
       err = {
@@ -30,14 +31,23 @@ a127.init((config) => {
     res.end(JSON.stringify(err));
   });
 
+  var options = {
+    db: config.db,
+    swaggerObject: config['a127.magic'].swaggerObject,
+    models: './src/api/models'
+  };
+
+  var db = swaggerMongoose(app, options);
+
   db.connection.once('open', () => {
-    console.info('Connected to database: ' + config.db);
     var apiPort = process.env.APIPORT || 10010;
     // begin listening for client requests
     app.listen(apiPort);
-
-    console.info('----\n==> 🌎  API is running on port %s', apiPort);
-    console.info('==> 💻  Send requests to http://%s:%s', 'localhost', apiPort);
-    console.log('try this:\ncurl http://127.0.0.1:' + apiPort + '/hello?name=Scott');
+    console.info('\x1b[32m_______________________________________________________________\x1b[0m');
+    console.info('\x1b[32m*\x1b[0m API is running on port %s', apiPort);
+    console.info('\x1b[32m*\x1b[0m Send requests to http://%s:%s', 'localhost', apiPort);
+    console.log('\x1b[32m*\x1b[0m Try this: curl http://127.0.0.1:' + apiPort + '/hello?name=Scott');
+    console.info('\x1b[32m_______________________________________________________________\x1b[0m');
+    console.info('');
   });
 });

@@ -8,12 +8,12 @@
  */
 
 import mongoose from 'mongoose';
-import autoload from './loadModels.js';
+import { load as autoload } from './loadModels';
 
 export function init (app, config) {
   app.set('mongoose', mongoose);
   if (!config) {
-    console.log('Error initializing mongo, please set a127 config');
+    console.log('Error initializing mongo, please pass db');
     return;
   }
 
@@ -21,11 +21,11 @@ export function init (app, config) {
     console.log('Error, initizializing mongo, please add params object.db');
   }
 
-  var modelLoaded = autoload.load(mongoose, config, false, app);
-
   mongoose.connect(config.db);
 
   mongoose.connection.on('connected', function () {
+    var modelLoaded = autoload(mongoose, config, true, app);
+
     console.info('\x1b[32m_______________________________________________________________\x1b[0m');
     console.info(':: Mongo DB - start info log');
     console.log(' ');

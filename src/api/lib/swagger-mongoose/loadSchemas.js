@@ -161,19 +161,15 @@ var getSchema = function (objectName, fullObject) {
 
     if (isMongooseProperty(property)) {
       props[key] = getMongooseSpecific(props, property);
-    }
-    else if (isMongooseArray(property)) {
+    } else if (isMongooseArray(property)) {
       props[key] = [getMongooseSpecific(props, property)];
-    }
-    else if (isPropertyHasRef(property)) {
+    } else if (isPropertyHasRef(property)) {
       processRef(property, objectName, props, key, required);
-    }
-    else if (property.type) {
+    } else if (property.type) {
       var type = propertyMap(property);
       props[key] = {type: type};
       fillRequired(props, key, required);
-    }
-    else if (isSimpleSchema(object)) {
+    } else if (isSimpleSchema(object)) {
       props = {type: propertyMap(object)};
     }
   });

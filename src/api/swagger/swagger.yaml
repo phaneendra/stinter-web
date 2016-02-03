@@ -23,7 +23,7 @@ paths:
 # Hello paths
   /hello:
     # binds a127 app logic to a route
-    x-swagger-router-controller: hello_world
+    x-swagger-router-controller: hello/hello_world
     x-a127-apply: {}
     get:
       description: Returns 'Hello' to the caller
@@ -686,7 +686,7 @@ definitions:
         type: integer
         format: int64
         description: The created date of the blog, in the epoch time representation.
-      lastUpdateedDate:
+      lastUpdatedDate:
         type: integer
         format: int64
         description: The last update date of the blog, in the epoch time representation.

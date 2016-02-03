@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
-import swaggerSchemas from './loadSchemas.js';
+import _ from 'lodash';
+import * as swaggerSchemas from './loadSchemas.js';
 
 function walk (dir) {
   var results = [];
@@ -49,10 +50,18 @@ export function load (mongoose, config, recursive, app) {
     if (fs.statSync(file).isFile()) {
       var name = path.basename(file);
       name = name.replace('.js', '');
-      mongoose.models[name] = require(file)(mongoose, name, schemas[name], app);
+      mongoose.models[name] = require(file).default(mongoose, name, schemas[name], app);
 
       modelName.push(name);
     }
   }
+
+  _.forEach(schemas, function (schema, key) {
+    if (!_.includes(modelName, key)) {
+      mongoose.models[name] = mongoose.model(key, schema);
+      modelName.push(key);
+    }
+  });
+
   return modelName;
 }

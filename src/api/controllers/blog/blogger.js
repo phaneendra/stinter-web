@@ -1,24 +1,28 @@
 import util from 'util';
 
-export function createBlog (req, res) {
-  // variables defined in the Swagger document can be referenced using req.swagger.params.{parameter_name}
-  var name = req.swagger.params.name.value || 'stranger';
-  var hello = util.format('Creating a blog, %s!', name);
+export function createBlog (req, res, next) {
+  var app = req.app;
+  var mongoose = app.get('mongoose');
 
-  // this sends back a JSON response which is a single string
-  res.json(hello);
+  var Blog = mongoose.model('Blog');
+  console.log(req.swagger.params.blog.value);
+  var blog = new Blog(req.swagger.params.blog.value);
+  blog.save((err) => {
+    if (err) {
+      next(err);
+    } else {
+      // this sends back a JSON response which is a single string
+      res.status(200).json({ message: 'Blog added!', data: blog._id });
+    }
+  });
 }
 
 export function listBlogs (req, res) {
-  console.log("Listing all blogs");
   // variables defined in the Swagger document can be referenced using req.swagger.params.{parameter_name}
   var title = req.swagger.params.title.value || 'stranger';
-  console.log(title);
   var hello = util.format(title);
-
-  console.log(hello);
   // this sends back a JSON response which is a single string
-  res.json(hello);
+  res.status(200).json({message: 'Blog Listing!', data: hello});
 }
 
 export function updateBlog (req, res) {
