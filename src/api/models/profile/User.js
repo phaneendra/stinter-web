@@ -4,5 +4,11 @@ export default (mongoose, modelName, schema, app) => {
   //
   console.log('Intializing model' + modelName);
 
+  /**
+   * Validations
+   */
+  Schema.path('username').required(true, 'Username cannot be blank');
+  Schema.path('password').required(true, 'Password cannot be blank');
+
   return mongoose.model(modelName, schema);
 };

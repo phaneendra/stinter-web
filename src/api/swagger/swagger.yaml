@@ -17,14 +17,109 @@ consumes:
 # format of the responses to the client (Accepts)
 produces:
   - application/json
-x-a127-config: {}
-x-a127-services: {}
+# oauth2 security definitions
+securityDefinitions:
+  oauth2:
+    type: oauth2
+    scopes:
+        read: "allow read"
+    flow: password
+    tokenUrl: /auth/token
+    x-swagger-magic-invalidateTokenUrl: /auth/invalidate
+    x-swagger-magic-social:
+      services:
+        - google
+        - facebook
+      callback:
+        success: http://127.0.0.1:3001/socialAuthSuccess
+        failure: http://127.0.0.1:3001/failure
 paths:
+# Authentication paths and controller
+  /auth/socialAuthSuccess:
+    x-swagger-router-controller: ctr
+    get:
+      description: description
+      operationId: socialAuthSuccess
+      parameters:
+        - name: token
+          in: query
+          description: token
+          required: true
+          type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/Response"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /auth/token:
+    x-swagger-router-controller: auth
+    post:
+      description: "Auth token endpoint"
+      summary: "Auth token endpoint"
+      operationId: "getToken"
+      produces:
+        - "application/json"
+      tags:
+        - Auth
+      parameters:
+        -
+          name: "user"
+          in: "body"
+          description: "The user"
+          required: true
+          schema:
+            $ref: "#/definitions/AuthTokenRequest"
+      responses:
+        200:
+          description: "Token"
+          schema:
+            $ref: "#/definitions/AuthToken"
+        400:
+          description: "Error"
+          schema:
+            $ref: "#/definitions/AuthError"
+        default:
+          description: "Error"
+          schema:
+            $ref: "#/definitions/AuthError"
+  /auth/invalidate:
+    x-swagger-router-controller: auth
+    post:
+      description: "Auth token endpoint"
+      summary: "Auth token endpoint"
+      operationId: "invalidateToken"
+      produces:
+        - "application/json"
+      tags:
+        - Auth
+      parameters:
+        -
+          name: "token"
+          in: "body"
+          description: "The token to invalidate"
+          required: true
+          schema:
+            $ref: "#/definitions/InvalidateRequest"
+      responses:
+        200:
+          description: "Success response"
+        400:
+          description: "Error"
+          schema:
+            $ref: "#/definitions/AuthError"
+        default:
+          description: "Error"
+          schema:
+            $ref: "#/definitions/AuthError"
+        x-swagger-magic-null: 200
 # Hello paths
   /hello:
-    # binds a127 app logic to a route
+    # binds app logic to a route
     x-swagger-router-controller: hello/hello_world
-    x-a127-apply: {}
     get:
       description: Returns 'Hello' to the caller
       # used as the method name of the controller
@@ -46,10 +141,208 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
+# User paths
+  /user:
+    x-swagger-router-controller: user/profile
+    get:
+      description: Returns a list of users
+      operationId: listUsers
+      parameters:
+        - name: name
+          in: query
+          description: This is used to search users by name
+          required: false
+          type: string
+        - name: role
+          in: query
+          description: The role of the person to whom to search for
+          required: false
+          type: string
+        - name: email
+          in: query
+          description: This is used to search users by email
+          required: false
+          type: string
+        - name: joinedDateFrom
+          in: query
+          description: This should be in epoch time representation. The user is considered matched if he joined after this time.
+          required: false
+          type: integer
+          format: int64
+        - name: joinedDateTo
+          in: query
+          description: This should be in epoch time representation. The blog is considered matched if he joined before this time.
+          required: false
+          type: integer
+          format: int64
+        - name: limit
+          in: query
+          description: The record size limit for pagination, by default it is 10. If it is -1, all users of the challenge will be returned.
+          required: false
+          type: integer
+          format: int32
+        - name: offset
+          in: query
+          description: The starting index for pagination, starting from 0. By default it is 0
+          required: false
+          type: integer
+          format: int32
+        - name: sortBy
+          in: query
+          required: false
+          type: string
+          description: The sorting fields. OPTIONAL. "joinedDate", "email", "name", "role" are allowed. The default value is "joinedDate".
+        - name: sortType
+          in: query
+          required: false
+          type: string
+          description: The sorting type. OPTIONAL. "asc", "desc" are allowed. The default value is "desc".
+      responses:
+        200:
+          description: An array of users
+          schema:
+            type: object
+            properties:
+              total:
+                type: integer
+                format: int32
+                description: The count of all matched users.
+              totalPages:
+                type: integer
+                format: int32
+                description: The total pages of all matched users.
+              values:
+                type: array
+                items:
+                  $ref: '#/definitions/User'
+        400:
+          description: The input or filter is not valid
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      description: Creates an User
+      operationId: createUser
+      parameters:
+        - name: user
+          in: body
+          description: The user to add
+          required: true
+          schema:
+            $ref: '#/definition/User'
+  /user/{id}:
+    x-swagger-router-controller: user/profile
+    put:
+      operationId: updateProfile
+      summary: Update a User Profile.
+      description: |
+        This method will update a user. It can only be done by the user or the admin.
+      tags:
+        - User
+      parameters:
+        - name: id
+          in: path
+          description: The ID of user.
+          required: true
+          type: integer
+          format: int64
+        - name: user
+          in: body
+          description: The user to update.
+          required: true
+          schema:
+            $ref: '#/definitions/User'
+      responses:
+        200:
+          description: The updated user
+          schema:
+            $ref: '#/definitions/User'
+        400:
+          description: The input is not valid
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: The user is not allowed to perform the update on the resource.
+          schema:
+            $ref: '#/definitions/Error'
+        404:
+          description: The requested resource doesn't exists
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    get:
+      operationId: viewProfile
+      summary: Get a User Profile by ID.
+      description: |
+        This method will get a User by ID.
+      tags:
+        - User
+      parameters:
+        - name: id
+          in: path
+          description: The ID of user.
+          required: true
+          type: integer
+          format: int64
+      responses:
+        200:
+          description: The User with given ID.
+          schema:
+            $ref: '#/definitions/User'
+        400:
+          description: The input is not valid
+          schema:
+            $ref: '#/definitions/Error'
+        404:
+          description: The requested resource doesn't exists
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      operationId: removeProfile
+      summary: Delete a User Profile by ID.
+      description: |
+        This method will delete a User by ID. It can only be done by the User himself or admin
+      tags:
+        - User
+      parameters:
+        - name: id
+          in: path
+          description: The ID of User.
+          required: true
+          type: integer
+          format: int64
+      responses:
+        200:
+          description: The User with given ID is deleted.
+        400:
+          description: The input is not valid
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: The user is not allowed to perform the update on the resource.
+          schema:
+            $ref: '#/definitions/Error'
+        404:
+          description: The requested resource doesn't exists
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
 # Blog paths
   /blogs:
     x-swagger-router-controller: blog/blogger
-    x-a127-apply: {}
     post:
       operationId: createBlog
       summary: Create a Blog
@@ -172,7 +465,6 @@ paths:
             $ref: '#/definitions/Error'
   /blogs/{id}:
     x-swagger-router-controller: blog/blogger
-    x-a127-apply: {}
     put:
       operationId: updateBlog
       summary: Update a Blog.
@@ -280,7 +572,6 @@ paths:
             $ref: '#/definitions/Error'
   /blogs/{id}/publish:
     x-swagger-router-controller: blog/blogger
-    x-a127-apply: {}
     post:
       operationId: publishBlog
       summary: Publish a Blog
@@ -316,9 +607,8 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-  /blogs/{id}/read:
+  /blogs/{id}/markread:
     x-swagger-router-controller: blog/blogger
-    x-a127-apply: {}
     post:
       operationId: markRead
       summary: Mark a Blog as Viewed
@@ -354,7 +644,6 @@ paths:
             $ref: '#/definitions/Error'
   /blogs/{id}/upvote:
     x-swagger-router-controller: blog/votes
-    x-a127-apply: {}
     post:
       operationId: upVote
       summary: Up-Vote a Blog
@@ -390,7 +679,6 @@ paths:
             $ref: '#/definitions/Error'
   /blogs/{id}/downvote:
     x-swagger-router-controller: blog/votes
-    x-a127-apply: {}
     post:
       operationId: downVote
       summary: Down-Vote a Blog
@@ -426,7 +714,6 @@ paths:
             $ref: '#/definitions/Error'
   /blogs/{id}/comments:
     x-swagger-router-controller: blog/comments
-    x-a127-apply: {}
     post:
       operationId: addComment
       summary: Add a Comment
@@ -467,7 +754,6 @@ paths:
             $ref: '#/definitions/Error'
   /blogs/{blogId}/comments/{commentId}:
     x-swagger-router-controller: blog/comments
-    x-a127-apply: {}
     put:
       operationId: updateComment
       summary: Update a Comment
@@ -558,7 +844,6 @@ paths:
             $ref: '#/definitions/Error'
   /blogs/{blogId}/comments/{commentId}/like:
     x-swagger-router-controller: blog/comments
-    x-a127-apply: {}
     post:
       operationId: likeComment
       summary: Like a Comment
@@ -601,7 +886,6 @@ paths:
             $ref: '#/definitions/Error'
   /blogs/{blogId}/comments/{commentId}/dislike:
     x-swagger-router-controller: blog/comments
-    x-a127-apply: {}
     post:
       operationId: dislikeComment
       summary: Dislike a Comment
@@ -644,6 +928,36 @@ paths:
             $ref: '#/definitions/Error'
 # complex objects have schema definitions
 definitions:
+# Auth Definitions
+  AuthTokenRequest:
+    required:
+      - username
+      - password
+    properties:
+      username:
+        type: "string"
+      password:
+        type: "string"
+  InvalidateRequest:
+    required:
+      - token
+    properties:
+      token:
+        type: "string"
+  AuthToken:
+    required:
+      - "access_token"
+    properties:
+      access_token:
+        type: "string"
+      scope:
+        type: "string"
+  AuthError:
+    required:
+      - "message"
+    properties:
+      message:
+        type: "string"
 # Hello definitions
   HelloWorldResponse:
     required:
@@ -651,6 +965,7 @@ definitions:
     properties:
       message:
         type: string
+# Error definitions
   ErrorResponse:
     required:
       - message
@@ -758,13 +1073,184 @@ definitions:
         type: integer
         format: int32
         description: The count of dislikes for the blog.
-# User definitions
+# User Management definitions
   User:
     properties:
       id:
         type: integer
         format: int64
-        description: The id of user.
-      Handle:
+        description: The id of user
+      username:
         type: string
-        description: The handle of user.
+        description: The username of user
+      password:
+        type: password
+        description: The password of user
+      email:
+        type: string
+        description: The primary email of user
+      profileImage:
+        type: string
+        description: The url of the primary profile image for the user
+      timeCreated:
+        type: date
+        description: The date this user was created
+      status:
+        type: string
+        description: The current state of the user, one of 'active', 'blocked', 'deactive'
+      profile:
+        type: object
+        description: The variations on the profile type for an user.
+        properties:
+          account:
+            $ref: '#/definitions/Account'
+          stinter:
+            $ref: '#/definition/Stinter'
+          admin:
+            $ref: '#/definitions/Admin'
+      role:
+        type: array
+        items:
+          $ref: '#/definition/Role'
+      isVerified:
+        type: boolean
+        description: Specifies if the account is verified or not
+      verificationToken:
+        type: string
+        description: The token used for verification
+      provider:
+        type: string
+        description:
+  Account:
+    properties:
+      id:
+        type: integer
+        format: int64
+        description: The id of user
+      name:
+        type: object
+        properties:
+          familyName:
+            type: string
+            description: The family name of this user, or "last name" in most Western languages
+          givenName:
+            type: string
+            description: The given name of this user, or "first name" in most Western languages
+          middleName:
+            type: string
+            description: The middle name of this user
+      displayName:
+        type: string
+        description: The disply name of the user
+      phone:
+        type: string
+        description: The phone number of the user
+      address:
+        type: string
+        description: The primary address of the user
+      zip:
+        type: interger
+        format: int64
+        description: The postal code of the users primary address
+      lat:
+        type: number
+        description: The latitude of users primary address
+      long:
+        type: number
+        description: The longitude of the users primary address
+      image:
+        type: array
+        description: The list of profile images for the user
+        item:
+          $ref: '#/definitions/Image'
+      emails:
+        type: array
+        description: The list of additional emails for the user
+        item:
+          $ref: '#/definition/Email'
+      notes:
+        type: string
+        description: Additional infromation for the user
+      twitter:
+        type: string
+        description: The twitter id of the user
+      facebook:
+        type: string
+        description: The facebook id of the user
+      google:
+        type: string
+        description: The google id of the user
+      github:
+        type: string
+        description: The github id of the user
+  Stinter:
+    properties:
+      id:
+        type: integer
+        format: int64
+        description: The id of user
+      ratings:
+        type: interger
+        format: int64
+        description: The ratings of the stinter, integer on a scale of 1 - 5
+      jobsCompleted:
+        type: integer
+        format: int64
+        description: The total number of jobs completed by this stinter
+  Admin:
+    properties:
+      id:
+        type: integer
+        format: int64
+        description: The id of user
+      displayName:
+        type: string
+        description: The disply name of the user
+  Role:
+    properties:
+      id:
+        type: integer
+        format: int64
+        description: The id of the Role
+      name:
+        type: string
+        description: The name of the role
+      description:
+        type: string
+        description: The roles description
+      isInternal:
+        type: boolean
+        description: If set to true this role will not be displayed in the UI
+      scopes:
+        type: array
+        description: The list of permission scopes for this role
+        items:
+          $ref: '#/definitions/Scope'
+  Scope:
+    properties:
+      id:
+        type: integer
+        format: int64
+        description: The id for the scope
+      value:
+        type: string
+        description: The permission value for the scope
+      description:
+        type: string
+        description: Descripes the scope permission in the app
+  Email:
+    properties:
+      email:
+        type: string
+        description: The email address of the user
+      isVerified:
+        type: boolean
+        description: Is used to mark if the user as activated his account via this email
+      sendNotifications:
+        type: boolean
+        description: marks this email address to send notification to the user
+  Image:
+    properties:
+      url:
+        type: string
+        description: The image url for the user

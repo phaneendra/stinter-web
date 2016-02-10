@@ -3,7 +3,9 @@
 import a127 from 'a127-magic';
 import express from 'express';
 import { init as swaggerMongoose } from './lib/swagger-mongoose';
+import { logger } from './lib/logger';
 
+var log = logger(module);
 var app = express();
 
 export default app; // for testing
@@ -43,11 +45,11 @@ a127.init((config) => {
     var apiPort = process.env.APIPORT || 10010;
     // begin listening for client requests
     app.listen(apiPort);
-    console.info('\x1b[32m_______________________________________________________________\x1b[0m');
-    console.info('\x1b[32m*\x1b[0m API is running on port %s', apiPort);
-    console.info('\x1b[32m*\x1b[0m Send requests to http://%s:%s', 'localhost', apiPort);
-    console.log('\x1b[32m*\x1b[0m Try this: curl http://127.0.0.1:' + apiPort + '/hello?name=Scott');
-    console.info('\x1b[32m_______________________________________________________________\x1b[0m');
-    console.info('');
+    log.info('\x1b[32m_______________________________________________________________\x1b[0m');
+    log.info('\x1b[32m*\x1b[0m API is running on port %s', apiPort);
+    log.info('\x1b[32m*\x1b[0m Send requests to http://%s:%s', 'localhost', apiPort);
+    log.log('\x1b[32m*\x1b[0m Try this: curl http://127.0.0.1:' + apiPort + '/hello?name=Scott');
+    log.info('\x1b[32m_______________________________________________________________\x1b[0m');
+    log.info('');
   });
 });
