@@ -34,88 +34,6 @@ securityDefinitions:
         success: http://127.0.0.1:3001/socialAuthSuccess
         failure: http://127.0.0.1:3001/failure
 paths:
-# Authentication paths and controller
-  /auth/socialAuthSuccess:
-    x-swagger-router-controller: ctr
-    get:
-      description: description
-      operationId: socialAuthSuccess
-      parameters:
-        - name: token
-          in: query
-          description: token
-          required: true
-          type: string
-      responses:
-        "200":
-          description: Success
-          schema:
-            $ref: "#/definitions/Response"
-        default:
-          description: Error
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-  /auth/token:
-    x-swagger-router-controller: auth
-    post:
-      description: "Auth token endpoint"
-      summary: "Auth token endpoint"
-      operationId: "getToken"
-      produces:
-        - "application/json"
-      tags:
-        - Auth
-      parameters:
-        -
-          name: "user"
-          in: "body"
-          description: "The user"
-          required: true
-          schema:
-            $ref: "#/definitions/AuthTokenRequest"
-      responses:
-        200:
-          description: "Token"
-          schema:
-            $ref: "#/definitions/AuthToken"
-        400:
-          description: "Error"
-          schema:
-            $ref: "#/definitions/AuthError"
-        default:
-          description: "Error"
-          schema:
-            $ref: "#/definitions/AuthError"
-  /auth/invalidate:
-    x-swagger-router-controller: auth
-    post:
-      description: "Auth token endpoint"
-      summary: "Auth token endpoint"
-      operationId: "invalidateToken"
-      produces:
-        - "application/json"
-      tags:
-        - Auth
-      parameters:
-        -
-          name: "token"
-          in: "body"
-          description: "The token to invalidate"
-          required: true
-          schema:
-            $ref: "#/definitions/InvalidateRequest"
-      responses:
-        200:
-          description: "Success response"
-        400:
-          description: "Error"
-          schema:
-            $ref: "#/definitions/AuthError"
-        default:
-          description: "Error"
-          schema:
-            $ref: "#/definitions/AuthError"
-        x-swagger-magic-null: 200
 # Hello paths
   /hello:
     # binds app logic to a route
@@ -928,36 +846,6 @@ paths:
             $ref: '#/definitions/Error'
 # complex objects have schema definitions
 definitions:
-# Auth Definitions
-  AuthTokenRequest:
-    required:
-      - username
-      - password
-    properties:
-      username:
-        type: "string"
-      password:
-        type: "string"
-  InvalidateRequest:
-    required:
-      - token
-    properties:
-      token:
-        type: "string"
-  AuthToken:
-    required:
-      - "access_token"
-    properties:
-      access_token:
-        type: "string"
-      scope:
-        type: "string"
-  AuthError:
-    required:
-      - "message"
-    properties:
-      message:
-        type: "string"
 # Hello definitions
   HelloWorldResponse:
     required:

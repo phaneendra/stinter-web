@@ -6,7 +6,6 @@ import cors from 'cors';
 import swaggerTools from 'swagger-tools';
 import authHandler from 'swagger-magic-auth-handler';
 import socialAuthHandler from 'swagger-magic-social-auth-handler';
-import controllersToCacheFormat from './controllers-to-cache-format';
 import securityHandlers from './security-handlers';
 import errorHandler from './error-handler';
 import { options } from './config';
@@ -28,10 +27,10 @@ export default function init (swaggerObject, callback) {
       var authController = authHandler(options.swaggerObject, options.token, options.auth);
       var socialAuthController = socialAuthHandler(options.swaggerObject, options.token, options.socialAuth);
 
-      options.controllers = options.controllers.controllers || {};
+      options.controllers = options.controllers.controller || {};
 
       if (authController && !options.useStubs) {
-        options.controllers[authController.name] = authController.methods;
+        options.controllers.controller[authController.name] = authController.methods;
       }
 
       if (socialAuthController) {

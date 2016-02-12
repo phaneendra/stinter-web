@@ -1,0 +1,109 @@
+paths:
+# Authentication paths and controller
+  /auth/socialAuthSuccess:
+    x-swagger-router-controller: ctr
+    get:
+      description: description
+      operationId: socialAuthSuccess
+      parameters:
+        - name: token
+          in: query
+          description: token
+          required: true
+          type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/Response"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /auth/token:
+    x-swagger-router-controller: localAuth
+    post:
+      description: "Auth token endpoint"
+      summary: "Auth token endpoint"
+      operationId: "getToken"
+      produces:
+        - "application/json"
+      tags:
+        - Auth
+      parameters:
+        - name: "user"
+          in: "body"
+          description: "The user"
+          required: true
+          schema:
+            $ref: "#/definitions/AuthTokenRequest"
+      responses:
+        200:
+          description: "Token"
+          schema:
+            $ref: "#/definitions/AuthToken"
+        400:
+          description: "Error"
+          schema:
+            $ref: "#/definitions/AuthError"
+        default:
+          description: "Error"
+          schema:
+            $ref: "#/definitions/AuthError"
+  /auth/invalidate:
+    x-swagger-router-controller: localAuth
+    post:
+      description: "Invalidate auth token endpoint"
+      summary: "Invalidate auth token endpoint"
+      operationId: "invalidateToken"
+      produces:
+        - "application/json"
+      tags:
+        - Auth
+      parameters:
+        - name: "token"
+          in: "body"
+          description: "The token to invalidate"
+          required: true
+          type: "string"
+      responses:
+        200:
+          description: "Success response"
+        400:
+          description: "Error"
+          schema:
+            $ref: "#/definitions/AuthError"
+        default:
+          description: "Error"
+          schema:
+            $ref: "#/definitions/AuthError"
+        x-swagger-magic-null: 200
+definitions:
+# Auth Definitions
+  AuthTokenRequest:
+    required:
+      - password
+    properties:
+      username:
+        type: "string"
+        description: The username of the user trying to login
+      password:
+        type: "string"
+        description: The password of the user trying to login
+      email:
+        type: "string"
+        description: The email of the user trying to login
+  AuthToken:
+    required:
+      - "access_token"
+    properties:
+      access_token:
+        type: "string"
+      scope:
+        type: "string"
+  AuthError:
+    required:
+      - "message"
+    properties:
+      message:
+        type: "string"
