@@ -1,45 +1,21 @@
 'use strict';
 
-import a127 from 'a127-magic';
-import express from 'express';
 import { init as swaggerMongoose } from './lib/swagger-mongoose';
-import { logger } from './lib/logger';
-
-var log = logger(module);
-var app = express();
+import { app } from './lib/swagger-express';
+import { log } from './lib/logger';
+import { options } from './lib/config';
 
 export default app; // for testing
 
-// initialize a127 framework - which expects a callback and passes config to it.
-a127.init((config) => {
-  // include a127 middleware
-  app.use(a127.middleware(config));
-
-  // error handler to emit errors as a json string
-  app.use((err, req, res, next) => {
-    console.log(err);
-    if (typeof err !== 'object') {
-      // If the object is not an Error, create a representation that appears to be
-      err = {
-        message: String(err) // Coerce to string
-      };
-    } else {
-      // Ensure that err.message is enumerable (It is not by default)
-      Object.defineProperty(err, 'message', { enumerable: true });
-    }
-
-    // Return a JSON representation of #/definitions/ErrorResponse
-    res.set('Content-Type', 'application/json');
-    res.end(JSON.stringify(err));
-  });
-
-  var options = {
+// initialize express framework - which expects a callback and passes config to it.
+app.init(options, (config) => {
+  var dboptions = {
     db: config.db,
-    swaggerObject: config['a127.magic'].swaggerObject,
+    swaggerObject: config.swaggerObject,
     models: './src/api/models'
   };
 
-  var db = swaggerMongoose(app, options);
+  var db = swaggerMongoose(app, dboptions);
 
   db.connection.once('open', () => {
     var apiPort = process.env.APIPORT || 10010;

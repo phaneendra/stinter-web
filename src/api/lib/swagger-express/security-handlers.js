@@ -1,4 +1,4 @@
-import _ from 'underscore';
+import _ from 'lodash';
 import httpStatus from 'http-status';
 
 function makeError (code, message) {
@@ -7,7 +7,7 @@ function makeError (code, message) {
   return err;
 }
 
-function createSwaggerSecurityOauth2PasswordFlowHandler (verifyToken, authorize) {
+function oauth2PasswordFlowHandler (authenticate, authorize) {
   return function (request, securityDefinition, scopes, cb) {
     var authorizationHeader = /Bearer (.+)/.exec(request.headers.authorization);
 
@@ -15,7 +15,7 @@ function createSwaggerSecurityOauth2PasswordFlowHandler (verifyToken, authorize)
       return cb(makeError(httpStatus.UNAUTHORIZED, 'authorization header is missing or in wrong format'));
     }
 
-    verifyToken(authorizationHeader[1], function (err, token) {
+    authenticate(authorizationHeader[1], function (err, token) {
       if (err) {
         return cb(makeError(httpStatus.UNAUTHORIZED));
       }
@@ -30,12 +30,20 @@ function createSwaggerSecurityOauth2PasswordFlowHandler (verifyToken, authorize)
   };
 }
 
-module.exports = function (securityDefinitions, verifyToken, authorize) {
+function jwtHandler (authenticate, authorize) {
+  return function (request, securityDefinition, scopes, cb) {
+
+  }
+}
+
+export default function (securityDefinitions, authenticate, authorize) {
   var handlers = {};
   _.each(securityDefinitions, function (securityDefinition, name) {
     if (securityDefinition.type === 'oauth2' && securityDefinition.flow === 'password') {
-      handlers[name] = createSwaggerSecurityOauth2PasswordFlowHandler(verifyToken, authorize);
+      handlers[name] = oauth2PasswordFlowHandler(authenticate, authorize);
+    } else if (securityDefinition.type === 'jwt') {
+      handlers[name] = jwtHandler();
     }
   });
   return handlers;
-};
+}
